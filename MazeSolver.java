@@ -17,7 +17,11 @@ public class MazeSolver {
             return false;
         }
         node.setVisited();
-        return RecDFSolve(maze, r + 1, c) || RecDFSolve(maze, r, c + 1) || RecDFSolve(maze, r - 1, c) || RecDFSolve(maze, r, c - 1);
+        if (RecDFSolve(maze, r + 1, c) || RecDFSolve(maze, r, c + 1) || RecDFSolve(maze, r - 1, c) || RecDFSolve(maze, r, c - 1)) {
+            return true;
+        }
+        node.clearVisited();
+        return false;
     }
     
     public static void IterDFSolve(Maze maze) {
@@ -26,21 +30,38 @@ public class MazeSolver {
         unvisited.push(maze.getPos(1, 0));
         while (!unvisited.isEmpty()) {
             Node node = unvisited.pop();
-            if (node == null || node.isWall()) {
-                continue;
-            }
             if (node.isEnd()) {
+                Node parent = node.getParent();
+                while (parent != null) {
+                    parent.setVisited();
+                    parent = parent.getParent();
+                }
                 break;
             }
-            int r = node.getRow();
-            int c = node.getCol();
             if (!visited.contains(node)) {
                 visited.add(node);
-                unvisited.push(maze.getPos(r, c - 1));
-                unvisited.push(maze.getPos(r - 1, c));
-                unvisited.push(maze.getPos(r, c + 1));
-                unvisited.push(maze.getPos(r + 1, c));
-                node.setVisited();
+                int r = node.getRow();
+                int c = node.getCol();
+                Node left = maze.getPos(r, c-1);
+                Node up = maze.getPos(r - 1, c);
+                Node right = maze.getPos(r, c + 1);
+                Node down = maze.getPos(r + 1, c);
+                if (left != null && !left.isWall() && !visited.contains(left)) {
+                    left.setParent(node);
+                    unvisited.push(left);
+                }
+                if (up != null && !up.isWall() && !visited.contains(up)) {
+                    up.setParent(node);
+                    unvisited.push(up);
+                }
+                if (right != null && !right.isWall() && !visited.contains(right)) {
+                    right.setParent(node);
+                    unvisited.push(right);
+                }
+                if (down != null && !down.isWall() && !visited.contains(down)) {
+                    down.setParent(node);
+                    unvisited.push(down);
+                }
             }
         }
     }
@@ -51,9 +72,6 @@ public class MazeSolver {
         unvisited.add(maze.getPos(1, 0));
         while (!unvisited.isEmpty()) {
             Node node = unvisited.remove();
-            if (node.isWall()) {
-                continue;
-            }
             if (node.isEnd()) {
                 Node parent = node.getParent();
                 while (parent != null) {
@@ -62,30 +80,30 @@ public class MazeSolver {
                 }
                 break;
             }
-            int r = node.getRow();
-            int c = node.getCol();
-            if (!visited.contains(node)) {
+            if (!visited.contains(node)) {        
                 visited.add(node);
-                Node left = maze.getPos(r, c-1);
-                Node up = maze.getPos(r - 1, c);
-                Node right = maze.getPos(r, c + 1);
+                int r = node.getRow();
+                int c = node.getCol();
                 Node down = maze.getPos(r + 1, c);
+                Node right = maze.getPos(r, c + 1);
+                Node up = maze.getPos(r - 1, c);
+                Node left = maze.getPos(r, c-1);
                 
-                if (left != null) {
-                    left.setParent(node);
-                    unvisited.add(left);
+                if (down != null && !down.isWall() && !visited.contains(down)) {
+                    down.setParent(node);
+                    unvisited.add(down);
                 }
-                if (up != null) {
-                    up.setParent(node);
-                    unvisited.add(up);
-                }
-                if (right != null) {
+                if (right != null && !right.isWall() && !visited.contains(right)) {
                     right.setParent(node);
                     unvisited.add(right);
                 }
-                if (down != null) {
-                    down.setParent(node);
-                    unvisited.add(down);
+                if (up != null && !up.isWall() && !visited.contains(up)) {
+                    up.setParent(node);
+                    unvisited.add(up);
+                }
+                if (left != null && !left.isWall() && !visited.contains(left)) {
+                    left.setParent(node);
+                    unvisited.add(left);
                 }
             }
         }
