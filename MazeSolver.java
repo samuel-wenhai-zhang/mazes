@@ -5,7 +5,13 @@ import java.util.Queue;
 import java.util.Set;
 
 public class MazeSolver {
-    public static boolean RecDFSolve(Maze maze, int r, int c) {
+
+    public static void clearScreen() {
+        System.out.println("\033[H\033[2J");
+        System.out.flush();
+    }
+
+    public static boolean RecDFSolve(Maze maze, int r, int c, boolean animated) {        
         Node node = maze.getPos(r,c);
         if (node == null) {
             return false;
@@ -17,7 +23,18 @@ public class MazeSolver {
             return false;
         }
         node.setVisited();
-        if (RecDFSolve(maze, r + 1, c) || RecDFSolve(maze, r, c + 1) || RecDFSolve(maze, r - 1, c) || RecDFSolve(maze, r, c - 1)) {
+        if (animated) {
+            clearScreen();
+            maze.display();
+            try {
+                Thread.sleep(100);
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (RecDFSolve(maze, r + 1, c, animated) || RecDFSolve(maze, r, c + 1, animated) || RecDFSolve(maze, r - 1, c, animated) || RecDFSolve(maze, r, c - 1, animated)) {
             return true;
         }
         node.clearVisited();
